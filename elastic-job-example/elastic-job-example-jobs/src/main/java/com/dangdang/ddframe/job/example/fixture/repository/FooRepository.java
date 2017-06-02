@@ -63,6 +63,6 @@ public class FooRepository {
     }
     
     public void setCompleted(final long id) {
-        data.get(id).setStatus(Foo.Status.COMPLETED);
+//        data.get(id).setStatus(Foo.Status.COMPLETED);
     }
 }

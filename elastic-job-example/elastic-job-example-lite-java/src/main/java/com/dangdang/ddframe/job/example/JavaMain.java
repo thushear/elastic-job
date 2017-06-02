@@ -40,12 +40,16 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
 
 public final class JavaMain {
+
+    //192.168.159.129:2181
+    private static final int EMBED_ZOOKEEPER_PORT = 2181;
     
-    private static final int EMBED_ZOOKEEPER_PORT = 4181;
+    private static final String ZOOKEEPER_CONNECTION_STRING = "192.168.159.129:" + EMBED_ZOOKEEPER_PORT;
     
-    private static final String ZOOKEEPER_CONNECTION_STRING = "localhost:" + EMBED_ZOOKEEPER_PORT;
-    
-    private static final String JOB_NAMESPACE = "elastic-job-example-lite-java";
+    private static final String JOB_NAMESPACE = "ejob";
+
+//    private static final String JOB_NAMESPACE = "r1";
+
     
     // switch to MySQL by yourself
 //    private static final String EVENT_RDB_STORAGE_DRIVER = "com.mysql.jdbc.Driver";
@@ -62,16 +66,17 @@ public final class JavaMain {
     // CHECKSTYLE:OFF
     public static void main(final String[] args) throws IOException {
     // CHECKSTYLE:ON
-        EmbedZookeeperServer.start(EMBED_ZOOKEEPER_PORT);
+//        EmbedZookeeperServer.start(EMBED_ZOOKEEPER_PORT);
         CoordinatorRegistryCenter regCenter = setUpRegistryCenter();
         JobEventConfiguration jobEventConfig = new JobEventRdbConfiguration(setUpEventTraceDataSource());
-        setUpSimpleJob(regCenter, jobEventConfig);
+//        setUpSimpleJob(regCenter, jobEventConfig);
         setUpDataflowJob(regCenter, jobEventConfig);
-        setUpScriptJob(regCenter, jobEventConfig);
+//        setUpScriptJob(regCenter, jobEventConfig);
     }
     
     private static CoordinatorRegistryCenter setUpRegistryCenter() {
         ZookeeperConfiguration zkConfig = new ZookeeperConfiguration(ZOOKEEPER_CONNECTION_STRING, JOB_NAMESPACE);
+//        zkConfig.setDigest("root");
         CoordinatorRegistryCenter result = new ZookeeperRegistryCenter(zkConfig);
         result.init();
         return result;
@@ -93,8 +98,8 @@ public final class JavaMain {
     }
     
     private static void setUpDataflowJob(final CoordinatorRegistryCenter regCenter, final JobEventConfiguration jobEventConfig) {
-        JobCoreConfiguration coreConfig = JobCoreConfiguration.newBuilder("javaDataflowElasticJob", "0/5 * * * * ?", 3).shardingItemParameters("0=Beijing,1=Shanghai,2=Guangzhou").build();
-        DataflowJobConfiguration dataflowJobConfig = new DataflowJobConfiguration(coreConfig, JavaDataflowJob.class.getCanonicalName(), true);
+        JobCoreConfiguration coreConfig = JobCoreConfiguration.newBuilder("javaDataflowElasticJobRight", "0/30 * * * * ?", 3).shardingItemParameters("0=Beijing,1=Shanghai,2=Guangzhou").build();
+        DataflowJobConfiguration dataflowJobConfig = new DataflowJobConfiguration(coreConfig, JavaDataflowJob.class.getCanonicalName(), false);
         new JobScheduler(regCenter, LiteJobConfiguration.newBuilder(dataflowJobConfig).build(), jobEventConfig).init();
     }
     
